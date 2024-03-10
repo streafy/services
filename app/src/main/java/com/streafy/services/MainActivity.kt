@@ -20,8 +20,11 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
-    private val requestPermissionLauncher =
-        registerForActivityResult(RequestPermission(), ::onGotNotificationPermissionResult)
+    private val requestPermissionLauncherForeground =
+        registerForActivityResult(RequestPermission(), ::onGotNotificationPermissionResultForeground)
+
+    private val requestPermissionLauncherIntent =
+        registerForActivityResult(RequestPermission(), ::onGotNotificationPermissionResultIntent)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,27 +35,50 @@ class MainActivity : AppCompatActivity() {
         }
         binding.foregroundService.setOnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                requestPermissionLauncherForeground.launch(Manifest.permission.POST_NOTIFICATIONS)
             } else {
                 stopService(MyService.newIntent(this))
                 startForegroundService()
             }
         }
+        binding.intentService.setOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requestPermissionLauncherIntent.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                startIntentService()
+            }
+        }
+    }
+
+    private fun startIntentService() {
+        ContextCompat.startForegroundService(this, MyIntentService.newIntent(this))
     }
 
     private fun startForegroundService() {
         ContextCompat.startForegroundService(this, MyForegroundService.newIntent(this))
     }
 
-    private fun onGotNotificationPermissionResult(isGranted: Boolean) {
+    private fun onGotNotificationPermissionResultForeground(isGranted: Boolean) {
         if (isGranted) {
             startForegroundService()
         } else {
-            if (!shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-                askUserToOpenAppSettingsForPermission()
-            } else {
-                showNotificationPermissionNeededToast()
-            }
+            explainPermissionNecessityToUser()
+        }
+    }
+
+    private fun onGotNotificationPermissionResultIntent(isGranted: Boolean) {
+        if (isGranted) {
+            startIntentService()
+        } else {
+            explainPermissionNecessityToUser()
+        }
+    }
+
+    private fun explainPermissionNecessityToUser() {
+        if (!shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+            askUserToOpenAppSettingsForPermission()
+        } else {
+            showNotificationPermissionNeededToast()
         }
     }
 

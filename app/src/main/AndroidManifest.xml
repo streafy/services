@@ -24,9 +24,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <service android:name=".MyService" />
-        <service android:name=".MyForegroundService"
-            android:foregroundServiceType="shortService"/>
+        <service
+            android:name=".MyForegroundService"
+            android:foregroundServiceType="shortService" />
+        <service
+            android:name=".MyIntentService"
+            android:foregroundServiceType="shortService" />
     </application>
 
 </manifest>

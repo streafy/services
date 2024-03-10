@@ -32,6 +32,7 @@ class MyForegroundService : Service() {
                 delay(1000)
                 Log.d("MyForegroundService", "Timer: $i")
             }
+            stopSelf()
         }
         return super.onStartCommand(intent, flags, startId)
     }

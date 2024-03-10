@@ -2,8 +2,6 @@ package com.streafy.services
 
 import android.app.job.JobParameters
 import android.app.job.JobService
-import android.content.Intent
-import android.os.IBinder
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,5 +39,10 @@ class MyJobService : JobService() {
         super.onDestroy()
         coroutineScope.cancel()
         Log.d("MyJobService", "onDestroy")
+    }
+
+    companion object {
+
+        const val JOB_ID = 1
     }
 }

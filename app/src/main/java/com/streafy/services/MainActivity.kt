@@ -3,6 +3,7 @@ package com.streafy.services
 import android.Manifest
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
+import android.app.job.JobWorkItem
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -28,6 +29,8 @@ class MainActivity : AppCompatActivity() {
 
     private val requestPermissionLauncherIntent =
         registerForActivityResult(RequestPermission(), ::onGotNotificationPermissionResultIntent)
+
+    private var page = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,7 +61,11 @@ class MainActivity : AppCompatActivity() {
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
                 .build()
             val jobScheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
-            jobScheduler.schedule(jobInfo)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val intent = MyJobService.newIntent(page++)
+                jobScheduler.enqueue(jobInfo, JobWorkItem(intent))
+            }
         }
     }
 
